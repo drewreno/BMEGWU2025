@@ -185,7 +185,8 @@ class MedRAG:
         # Generate answer(s)
         answers = []
         for context in contexts:
-            prompt_medrag = self.templates["medrag_prompt"].render(
+            # Updated: Use Python's format() instead of .render()
+            prompt_medrag = self.templates["medrag_prompt"].format(
                 context=context, question=question, options=options_text
             )
             logging.debug(f"Rendered prompt (MedRAG): {prompt_medrag[:200]}...")  # Beginning of prompt
@@ -234,6 +235,7 @@ class MedRAG:
 
         logging.debug(f"Exiting answer method with answers: {answers}")
         return answers[0] if len(answers) == 1 else answers, retrieved_snippets, scores
+
 
     def generate(self, messages):
         '''
