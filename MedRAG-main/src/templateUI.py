@@ -1,14 +1,13 @@
-from liquid import Template
 import tkinter as tk
 from tkinter import filedialog
 import sys
 
 temperature_G = 0  # 0 to 2
-MAX = 1000  # corpus token
+MAX = 10         # corpus token
 IMG_MAX = 10
 CHUNK_MAX = 1000
 
-# Define the templates and options
+# Define the system prompt (unchanged)
 general_medrag_system = '''
     DO NOT DISCUSS FILES WITHIN **CORPUS**
 
@@ -18,23 +17,21 @@ general_medrag_system = '''
     Your responses will be used for research purposes only, so please have a definite answer.
 '''
 
-# Start of corpus is more heavily weighted
-general_medrag = Template('''
-
-            
+# Updated template using Python string formatting
+general_medrag = '''
 Here are the background knowledge documents, do not reference this data in your response:
 <CORPUS>
-{{ context }}                  
+{context}                  
 </CORPUS>
 
 Here is the question and critical information used in your response. Overweigh the text:
-{{ question }}
+{question}
 
 Here are the potential choices. Give each a percentile confidence:
-{{ options }}
+{options}
 
 Please think step-by-step and generate your diagnosis in json (must be 100+ tokens if images are present):
-''')
+'''
 
 # Define options (for testing)
 """
@@ -59,12 +56,12 @@ options = {
 # Convert options dict to string format for the template
 options_text = '\n'.join([f"{key}. {value}" for key, value in options.items()])
 
-# If you have a context for the general_medrag template (can be None if not applicable)
+# Context for the general_medrag template (can be None if not applicable)
 context = "Sample context information relevant to the question."
 
 class TemplateRun:
     def __init__(self):
-        # Initialize Tkinter root window
+        # Initialize the Tkinter root window
         self.root = tk.Tk()
         self.root.withdraw()  # Hide the root window
 
@@ -80,7 +77,7 @@ class TemplateRun:
             print("No files selected. Exiting the program.")
             sys.exit()
 
-        # Read and concatenate the contents of all selected files into the 'question' variable
+        # Read and concatenate the contents of all selected files into a single 'question' string
         questions = []
         for file_path in text_file_paths:
             try:
@@ -92,7 +89,6 @@ class TemplateRun:
 
         # Join all questions with a separator (e.g., two newlines)
         question = "\n\n".join(questions)
-    
         return question
 
     def image_files(self):
@@ -108,16 +104,16 @@ class TemplateRun:
     
         return image_file_paths
 
-    # Render the general_medrag template
+    # Render the general_medrag template using Python's string formatting
     def rendered_medrag(self, question):
-        return general_medrag.render({
-            'context': context,
-            'question': question,
-            'options': options_text
-        })
+        return general_medrag.format(
+            context=context,
+            question=question,
+            options=options_text
+        )
 
     def run(self):
-        # Get question from text files
+        # Get question text from text files
         question = self.text_files()
 
         # Optionally, get image files if needed
