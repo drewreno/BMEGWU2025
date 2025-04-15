@@ -3,4 +3,4 @@ Prepare Package:
 
 Run Main_UI.py
 
-Be sure to adjust MAX in templateUI from 10 to a value like 1000+
+Be sure to adjust MAX in templateUI for token count
