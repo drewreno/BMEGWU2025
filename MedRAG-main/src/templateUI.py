@@ -3,7 +3,7 @@ from tkinter import filedialog
 import sys
 
 temperature_G = 0  # 0 to 2
-MAX = 10         # corpus token
+MAX = 1000         # corpus token
 IMG_MAX = 10
 CHUNK_MAX = 1000
 
