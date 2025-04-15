@@ -139,7 +139,8 @@ class FileSelectorUI:
         except Exception as e:
             logging.error(f"An error occurred during processing: {e}")
             # Schedule the error handling in the main thread
-            self.root.after(0, lambda: self.on_processing_error(loading_window, str(e)))
+            self.root.after(0, lambda e=e: self.on_processing_error(loading_window, str(e)))
+
 
     def on_processing_complete(self, loading_window, answer):
         loading_window.destroy()
