@@ -141,7 +141,6 @@ class FileSelectorUI:
             # Schedule the error handling in the main thread
             self.root.after(0, lambda e=e: self.on_processing_error(loading_window, str(e)))
 
-
     def on_processing_complete(self, loading_window, answer):
         loading_window.destroy()
 
@@ -163,22 +162,37 @@ class FileSelectorUI:
             with open('output.txt', 'w') as f:
                 f.write(f"Response: {answer}\n")
 
-        # Display the output to the user
-        messagebox.showinfo("Processing Complete", f"Response:\n{cleaned_json}")
+        # Create a scrollable result window
+        result_window = tk.Toplevel(self.root)
+        result_window.title("Processing Complete")
+        result_window.geometry("600x400")
 
-        # Clear file selections so new ones can be made for the next run
+        container = ttk.Frame(result_window)
+        container.pack(fill='both', expand=True, padx=5, pady=5)
+
+        text_widget = tk.Text(container, wrap='word')
+        text_widget.insert('1.0', cleaned_json)
+        text_widget.config(state='disabled')
+
+        vsb = ttk.Scrollbar(container, orient='vertical', command=text_widget.yview)
+        text_widget['yscrollcommand'] = vsb.set
+
+        vsb.pack(side='right', fill='y')
+        text_widget.pack(side='left', fill='both', expand=True)
+
+        close_btn = ttk.Button(result_window, text="Close", command=result_window.destroy)
+        close_btn.pack(pady=(0,5))
+
+        # Clear file selections and re-enable buttons
         self.selected_images = []
         self.selected_texts = []
         self.update_listbox(self.images_listbox, [])
         self.update_listbox(self.texts_listbox, [])
-
-        # Re-enable buttons for further use
         self.enable_buttons()
 
     def on_processing_error(self, loading_window, error_message):
         loading_window.destroy()
         messagebox.showerror("Error", f"An error occurred: {error_message}")
-        # Re-enable buttons so the user can try again
         self.enable_buttons()
 
     def disable_buttons(self):
