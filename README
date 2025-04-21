@@ -1,10 +1,14 @@
+# Your Project Name
+
 **Note**
 
-To run current protocol, run from Main_UI
-User text input should be blocked in with text file upload section
+To run the current protocol, run from `Main_UI`.  
+User text input should be blocked in with the text file upload section.
 
-API key has been removed from this version
+API key has been removed from this version.
 
+<!-- Relative path (simplest) -->
+![Example Image](./Figure_1.png)
 
-
-![Exmple Image](Figure_1.png)
+<!-- Or absolute raw GitHub URL -->
+![Example Image](https://raw.githubusercontent.com/drewreno/BMEGWU2025/main/Figure_1.png)
