@@ -1,14 +1,6 @@
 # MIRAGE
 
-**Note**
-
-To run the current protocol, run from `Main_UI`.  
-User text input should be blocked in with the text file upload section.
-
-API key has been removed from this version.
-
-![Example Image](./Figure_1.png)
-*Above is a visualization of all of the data from one input output cycle of the code.*
+API key has been removed from this version
 
 ---
 
@@ -22,20 +14,25 @@ The following diagram illustrates the high-level components and data flow within
 *Figure: Core modules and data flow in MIRAGE.*
 
 ## Data Visualization Example
+
+![Example Image](./Figure_1.png)
+*Above is a visualization of all of the data from one input output cycle of the code.*
+
+
 Below are comparisons of binary testing results over two rounds. These visualizations demonstrate improvements in accuracy and error reduction after system tuning:
 
 ### Round One Binary Testing
-![Round One Binary Testing Results](./corpus/images/Round%20One%20Binary%20Testing%20Results.png)
+![Round One Binary Testing Results](./RoundOneBinaryTestingResults.png)
 *Figure: Initial binary classification performance metrics.*
 
 ### Round Two Binary Testing
-![Round Two Binary Testing Results](./corpus/images/Round%20Two%20Binary%20Testing%20Results.png)
+![Round Two Binary Testing Results](./RoundTwoBinaryTestingResults.png)
 *Figure: Refined model performance after RAG integration.*
 
 ## Detailed Specification
 For an in-depth system specification and design rationale, refer to the project PDF:
 
-- [System Specification Document](./corpus/images/c8bda819-72e7-4d88-9ade-8f83d0e9aedb.pdf)
+- [System Specification Document](./c8bda819-72e7-4d88-9ade-8f83d0e9aedb.pdf)
 
 ## Code Structure and Workflow
 The core code is organized as follows:
