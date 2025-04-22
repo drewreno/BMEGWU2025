@@ -10,28 +10,28 @@ MIRAGE is a Retrieval-Augmented Generation (RAG) system tailored for medical and
 ## Architecture Diagram
 The following diagram illustrates the high-level components and data flow within MIRAGE:
 
-![System Architecture](./Architecture.png)
+![System Architecture](./resources/Architecture.png)
 *Figure: Core modules and data flow in MIRAGE.*
 
 ## Data Visualization Example
 
-![Example Image](./Figure_1.png)
+![Example Image](./resources/Figure_1.png)
 *Above is a visualization of all of the data from one input output cycle of the code.*
 
 
 Below are comparisons of binary testing results over two rounds. These visualizations demonstrate improvements in accuracy and error reduction after system tuning:
 
 ### Round One Binary Testing
-![Round One Binary Testing Results](./RoundOneBinaryTestingResults.png)
+![Round One Binary Testing Results](./resources/RoundOneBinaryTestingResults.png)
 
 *Figure: Initial binary classification performance metrics.*
 
 ### Round Two Binary Testing
-![Round Two Binary Testing Results](./RoundTwoBinaryTestingResults.png)
+![Round Two Binary Testing Results](./resources/RoundTwoBinaryTestingResults.png)
 
 *Figure: Refined model performance after RAG integration.*
 
-- [Poster](./c8bda819-72e7-4d88-9ade-8f83d0e9aedb.pdf)
+- [Poster](./resources/presentation.pdf)
 
 ## Code Structure and Workflow
 The core code is organized as follows:
