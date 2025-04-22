@@ -1,7 +1,6 @@
 # MIRAGE
 
-API key has been removed from this version
-
+![Header](./resources/Architecture.png)
 ---
 
 ## Overview
@@ -71,4 +70,9 @@ The core code is organized as follows:
    ```
 5. **Select** text and image files via the upload section, then submit your query.
 
+
+## Release Notes
+API key has been removed from this version
+Llama version under Master
+API version under Main
 
