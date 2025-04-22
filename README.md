@@ -5,7 +5,7 @@
 ## Overview
 MIRAGE is a Retrieval-Augmented Generation (RAG) system tailored for medical and scientific data analysis. It ingests user-provided text and images, retrieves relevant context from a pre-built corpus, and synthesizes answers via the OpenAI API. MIRAGE is designed for high flexibility, supporting multiple file types and visual inputs.
 
-![Header](./resources/MIRAGE.png)
+![Header](./resources/MIRAGE2.png)
 
 ## Architecture Diagram
 The following diagram illustrates the high-level components and data flow within MIRAGE:
