@@ -63,7 +63,7 @@ The core code is organized as follows:
    ```bash
    pip install -r requirements.txt
    ```
-2. **Prepare your corpus** under `./corpus` (texts and images).
+2. **Prepare your corpus** under `./corpus` (manual input under `./corpus/textbooks/en`. 
 3. **Configure** your OpenAI API key in `config.py`.
 4. **Launch** the UI from the project root:
    ```bash
@@ -74,6 +74,8 @@ The core code is organized as follows:
 
 ## Release Notes
 API key has been removed from this version
+
 Llama version under Master
+
 API version under Main
 
