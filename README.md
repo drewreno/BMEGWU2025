@@ -31,7 +31,7 @@ Below are comparisons of binary testing results over two rounds. These visualiza
 
 *Figure: Refined model performance after RAG integration.*
 
-- [Poster](./resources/presentation.pdf)
+- [Poster](./resources/0ad59c96-a234-4c10-8855-484b9e4eb8d7.pdf)
 
 ## Code Structure and Workflow
 The core code is organized as follows:
