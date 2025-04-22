@@ -63,13 +63,14 @@ The core code is organized as follows:
    ```bash
    pip install -r requirements.txt
    ```
-2. **Prepare your corpus** under `./corpus` (manual input under `./corpus/textbooks/en`. 
-3. **Configure** your OpenAI API key in `config.py`.
-4. **Launch** the UI from the project root:
+2. **Prepare your corpus** under `./corpus` (manual input under `./corpus/textbooks/en`.
+3. **Initiate corpus** by running Textbooks.py or other under `./data`.
+4. **Configure** your OpenAI API key in `config.py`.
+5. **Launch** the UI from the project root:
    ```bash
    python Main_UI.py
    ```
-5. **Select** text and image files via the upload section, then submit your query.
+6. **Select** text and image files via the upload section, then submit your query.
 
 
 ## Release Notes
