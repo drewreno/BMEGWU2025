@@ -5,11 +5,11 @@ import threading
 import json
 import re
 import os
+import tempfile
 
 w = 600
-h = 300
+h = 400  # Increased height to accommodate text input
 gap = 5
-
 
 class FileSelectorUI:
     def __init__(self, root):
@@ -19,8 +19,11 @@ class FileSelectorUI:
         self.root.configure(bg='white')
 
         # Configure rows and columns for dynamic resizing
-        self.root.rowconfigure(0, weight=1)  # Frames row
-        self.root.rowconfigure(1, weight=0)  # Buttons row
+        self.root.rowconfigure(0, weight=0)  # Text input row
+        self.root.rowconfigure(1, weight=1)  # Frames row
+        self.root.rowconfigure(2, weight=0)  # Buttons row
+        self.root.rowconfigure(3, weight=0)
+        self.root.rowconfigure(4, weight=0)
         self.root.columnconfigure(0, weight=1)
         self.root.columnconfigure(1, weight=1)
 
@@ -28,28 +31,34 @@ class FileSelectorUI:
         self.selected_images = []
         self.selected_texts = []
 
+        # Create text input at the top
+        self.create_text_input()
         # Create frames for Images and Text Files
         self.create_sections()
-
         # Create buttons
         self.create_buttons()
 
         # Bind the window close event to the on_closing method
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
+    def create_text_input(self):
+        input_frame = ttk.LabelFrame(self.root, text="Additional Text Input", padding=gap)
+        input_frame.grid(row=0, column=0, columnspan=2, sticky="nsew", padx=gap, pady=gap)
+        self.text_input = tk.Text(input_frame, height=5)
+        self.text_input.pack(fill=tk.BOTH, expand=True)
+
     def create_sections(self):
         # Frame for Images
         images_frame = ttk.LabelFrame(self.root, text="Selected Radiology Images", padding=gap)
-        images_frame.grid(row=0, column=0, sticky="nsew")
+        images_frame.grid(row=1, column=0, sticky="nsew", padx=gap, pady=gap)
 
         # Frame for Text Files
         texts_frame = ttk.LabelFrame(self.root, text="Selected Report Files", padding=gap)
-        texts_frame.grid(row=0, column=1, sticky="nsew")
+        texts_frame.grid(row=1, column=1, sticky="nsew", padx=gap, pady=gap)
 
         # Ensure uniform column sizing
         self.root.columnconfigure(0, weight=1, uniform="group1")
         self.root.columnconfigure(1, weight=1, uniform="group1")
-        self.root.rowconfigure(0, weight=1)
 
         # Listbox to display selected images
         self.images_listbox = tk.Listbox(images_frame, selectmode=tk.MULTIPLE)
@@ -62,19 +71,19 @@ class FileSelectorUI:
     def create_buttons(self):
         # Button to select images
         select_images_btn = ttk.Button(self.root, text="Select Images", command=self.select_images)
-        select_images_btn.grid(row=1, column=0, padx=gap, pady=gap, sticky="nsew")
+        select_images_btn.grid(row=2, column=0, padx=gap, pady=gap, sticky="nsew")
 
         # Button to select text files
         select_texts_btn = ttk.Button(self.root, text="Select Text Files", command=self.select_text_files)
-        select_texts_btn.grid(row=1, column=1, padx=gap, pady=gap, sticky="nsew")
+        select_texts_btn.grid(row=2, column=1, padx=gap, pady=gap, sticky="nsew")
 
         # Continue button (to process selected files)
         continue_btn = ttk.Button(self.root, text="Continue", command=self.continue_action)
-        continue_btn.grid(row=2, column=0, columnspan=2, padx=gap, pady=gap, sticky="nsew")
+        continue_btn.grid(row=3, column=0, columnspan=2, padx=gap, pady=gap, sticky="nsew")
 
         # Exit button (to close the program)
         exit_btn = ttk.Button(self.root, text="Exit", command=self.exit_action)
-        exit_btn.grid(row=3, column=0, columnspan=2, padx=gap, pady=gap, sticky="nsew")
+        exit_btn.grid(row=4, column=0, columnspan=2, padx=gap, pady=gap, sticky="nsew")
 
         # Store buttons (we disable these while processing)
         self.buttons = [select_images_btn, select_texts_btn, continue_btn]
@@ -105,13 +114,22 @@ class FileSelectorUI:
             listbox.insert(tk.END, item)
 
     def continue_action(self):
-        # Make sure some files have been selected
-        if not self.selected_images and not self.selected_texts:
-            messagebox.showwarning("No Selection", "Please select at least one image or text file.")
+        # Ensure at least one file or additional text is provided
+        additional_text = self.text_input.get("1.0", tk.END).strip()
+        if not (self.selected_images or self.selected_texts or additional_text):
+            messagebox.showwarning("No Selection", "Please select at least one image, text file, or enter additional text.")
             return
 
+        # If there's additional text, write it to a temporary file and include in texts
+        if additional_text:
+            tmp = tempfile.NamedTemporaryFile(delete=False, suffix='.txt', mode='w', encoding='utf-8')
+            tmp.write(additional_text)
+            tmp.close()
+            self.selected_texts.append(tmp.name)
+            self.texts_listbox.insert(tk.END, os.path.basename(tmp.name))
+
         # Confirm the action
-        confirm = messagebox.askyesno("Confirm", "Do you want to continue with the selected files?")
+        confirm = messagebox.askyesno("Confirm", "Do you want to continue with the selected files and text?" )
         if not confirm:
             return
 
@@ -122,7 +140,7 @@ class FileSelectorUI:
         loading = tk.Toplevel(self.root)
         loading.title("Processing")
         loading.geometry("300x100")
-        loading_label = tk.Label(loading, text="Processing selected files...\nPlease wait.", padx=20, pady=20)
+        loading_label = tk.Label(loading, text="Processing selected files...Please wait.", padx=20, pady=20)
         loading_label.pack()
 
         # Process files in a separate thread so the UI remains responsive
@@ -183,11 +201,12 @@ class FileSelectorUI:
         close_btn = ttk.Button(result_window, text="Close", command=result_window.destroy)
         close_btn.pack(pady=(0,5))
 
-        # Clear file selections and re-enable buttons
+        # Clear file selections and text input, then re-enable buttons
         self.selected_images = []
         self.selected_texts = []
         self.update_listbox(self.images_listbox, [])
         self.update_listbox(self.texts_listbox, [])
+        self.text_input.delete('1.0', tk.END)
         self.enable_buttons()
 
     def on_processing_error(self, loading_window, error_message):
@@ -204,13 +223,12 @@ class FileSelectorUI:
             btn.config(state='normal')
 
     def exit_action(self):
-        if messagebox.askokcancel("Exit", "Do you really want to exit?"):
+        if messagebox.askokcancel("Exit", "Do you really want to exit?" ):
             self.root.destroy()
 
     def on_closing(self):
-        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+        if messagebox.askokcancel("Quit", "Do you want to quit?" ):
             self.root.destroy()
-
 
 if __name__ == "__main__":
     root = tk.Tk()
