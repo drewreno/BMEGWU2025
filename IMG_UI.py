@@ -161,7 +161,7 @@ class MedRAG:
         # Generate answers
         answers = []
         for context in contexts:
-            prompt_medrag = self.templates["medrag_prompt"].render(
+            prompt_medrag = self.templates["medrag_prompt"].format(
                 context=context, question=question, options=options_text  # Options defined inside the template
             )
             logging.debug("Rendered prompt (MedRAG): %s", prompt_medrag)
