@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 import tempfile
+import json
 
 from accelerate import Accelerator
 import gradio as gr
@@ -13,28 +14,42 @@ from IMG_UI import process_selected_files
 accelerator = Accelerator()
 
 ### RUN ###
-# python Final_UI.py --gradio_ui
-# http://localhost:9801
+'''
+python Final_UI.py --gradio_ui
+http://localhost:9801
+'''
+
+def _process(images, texts, extra_text):
+    image_paths = [f.name for f in (images or [])]
+    text_paths  = [f.name for f in (texts or [])]
+
+    if extra_text:
+        tmp = tempfile.NamedTemporaryFile(
+            delete=False, suffix=".txt", mode="w", encoding="utf-8"
+        )
+        tmp.write(extra_text)
+        tmp.close()
+        text_paths.append(tmp.name)
+
+    # call your existing processing logic
+    result = process_selected_files(image_paths, text_paths)
+
+    # if the result is a JSON string, parse it to a dict
+    if isinstance(result, str):
+        try:
+            result = json.loads(result)
+        except json.JSONDecodeError:
+            # not valid JSON? return raw string
+            return result
+
+    # pretty-print as a JSON string for display
+    return json.dumps(result, indent=2)
 
 def gradio_interface():
     """
     Create a Gradio Blocks layout mirroring your Llama Vision UI,
     but with file-selector controls on the left and output on the right.
     """
-    def _process(images, texts, extra_text):
-        image_paths = [f.name for f in (images or [])]
-        text_paths  = [f.name for f in (texts or [])]
-
-        if extra_text:
-            tmp = tempfile.NamedTemporaryFile(
-                delete=False, suffix=".txt", mode="w", encoding="utf-8"
-            )
-            tmp.write(extra_text)
-            tmp.close()
-            text_paths.append(tmp.name)
-
-        return process_selected_files(image_paths, text_paths)
-
     with gr.Blocks(title="Radiology File Selector") as demo:
         # ---- Header ----
         gr.HTML("<h1 style='text-align: center'>Radiology File Selector</h1>")
@@ -64,10 +79,9 @@ def gradio_interface():
             # Right column: processing output
             with gr.Column(scale=2):
                 gr.Markdown("### Output")
-                output = gr.Textbox(
-                    placeholder="Results will appear here…",
-                    lines=20,
-                    interactive=False
+                output = gr.Code(
+                    label="Results",
+                    language="json"
                 )
 
         # ---- Wire up the button ----
@@ -78,7 +92,6 @@ def gradio_interface():
         )
 
     return demo
-
 
 def main():
     parser = argparse.ArgumentParser(
@@ -95,7 +108,6 @@ def main():
         demo.launch(server_name="0.0.0.0", server_port=9801)
     else:
         print("No UI mode selected. Use --gradio_ui to launch the Gradio interface.")
-
 
 if __name__ == "__main__":
     main()
