@@ -66,11 +66,15 @@ The core code is organized as follows:
 2. **Prepare your corpus** under `./corpus` (manual input under `./corpus/textbooks/en`.
 3. **Initiate corpus** by running Textbooks.py or other under `./data`.
 4. **Configure** your OpenAI API key in `config.py`.
-5. **Launch** the UI from the project root:
+5. **Launch** the old UI from the project root:
    ```bash
    python Main_UI.py
    ```
-6. **Select** text and image files via the upload section, then submit your query.
+   the new UI using:
+   ```bash
+   python Final_UI.py --gradio_ui
+   ```
+7. **Select** text and image files via the upload section, then submit your query.
 
 
 ## Release Notes
