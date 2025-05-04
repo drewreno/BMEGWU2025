@@ -1,8 +1,5 @@
 import argparse
-import os
-import sys
 import tempfile
-import json
 
 from accelerate import Accelerator
 import gradio as gr
@@ -14,61 +11,59 @@ from IMG_UI import process_selected_files
 accelerator = Accelerator()
 
 ### RUN ###
-'''
-python Final_UI.py --gradio_ui
-http://localhost:9801
-'''
-
-def _process(images, texts, extra_text):
-    image_paths = [f.name for f in (images or [])]
-    text_paths  = [f.name for f in (texts or [])]
-
-    if extra_text:
-        tmp = tempfile.NamedTemporaryFile(
-            delete=False, suffix=".txt", mode="w", encoding="utf-8"
-        )
-        tmp.write(extra_text)
-        tmp.close()
-        text_paths.append(tmp.name)
-
-    # call your existing processing logic
-    result = process_selected_files(image_paths, text_paths)
-
-    # if the result is a JSON string, parse it to a dict
-    if isinstance(result, str):
-        try:
-            result = json.loads(result)
-        except json.JSONDecodeError:
-            # not valid JSON? return raw string
-            return result
-
-    # pretty-print as a JSON string for display
-    return json.dumps(result, indent=2)
+# python Final_UI.py --gradio_ui
+# http://localhost:9801
 
 def gradio_interface():
     """
-    Create a Gradio Blocks layout mirroring your Llama Vision UI,
-    but with file-selector controls on the left and output on the right.
+    Create a Gradio Blocks layout with Ocean theme,
+    file-selector controls on the left, output on the right,
+    and a persistent image preview gallery.
     """
-    with gr.Blocks(title="Radiology File Selector") as demo:
+    def _process(image_files, text_files, extra_text):
+        # Convert list of file objects to file paths
+        image_paths = [f.name for f in (image_files or [])]
+        text_paths  = [f.name for f in (text_files or [])]
+
+        if extra_text:
+            tmp = tempfile.NamedTemporaryFile(
+                delete=False, suffix=".txt", mode="w", encoding="utf-8"
+            )
+            tmp.write(extra_text)
+            tmp.close()
+            text_paths.append(tmp.name)
+
+        return process_selected_files(image_paths, text_paths)
+
+    with gr.Blocks(title="Radiology File Selector", theme=gr.themes.Ocean()) as demo:
         # ---- Header ----
-        gr.HTML("<h1 style='text-align: center'>Radiology File Selector</h1>")
+        gr.HTML("<h1 style='text-align: center; color: white;'>Radiology File Selector</h1>")
 
         # ---- Two-column row ----
         with gr.Row():
-            # Left column: file inputs + extra text + button
+            # Left column: file inputs + gallery + extra text + button
             with gr.Column(scale=1):
-                gr.Markdown("### Inputs")
-                image_input = gr.File(
+                gr.Markdown("### Inputs", elem_id="input-header")
+
+                # Image files uploader with preview gallery
+                image_input = gr.Files(
                     label="Radiology Images",
                     file_count="multiple",
                     file_types=[".png", ".jpg", ".jpeg", ".bmp", ".gif"]
                 )
-                text_input = gr.File(
+                # Gallery with 2 columns to preview uploaded images
+                gallery = gr.Gallery(
+                    label="Preview of Uploaded Images",
+                    columns=2
+                )
+
+                # Report files input
+                text_input = gr.Files(
                     label="Report Files",
                     file_count="multiple",
                     file_types=[".txt", ".md", ".csv", ".log"]
                 )
+
                 extra_text = gr.Textbox(
                     label="Additional Notes",
                     placeholder="Type any extra notes here…",
@@ -79,12 +74,21 @@ def gradio_interface():
             # Right column: processing output
             with gr.Column(scale=2):
                 gr.Markdown("### Output")
-                output = gr.Code(
-                    label="Results",
-                    language="json"
+                output = gr.Textbox(
+                    placeholder="Results will appear here…",
+                    lines=20,
+                    interactive=False
                 )
 
-        # ---- Wire up the button ----
+        # ---- Event handlers ----
+        # Update gallery when image files are uploaded
+        image_input.change(
+            fn=lambda files: [f.name for f in (files or [])],
+            inputs=image_input,
+            outputs=gallery
+        )
+
+        # Process inputs when button is clicked
         cont_btn.click(
             fn=_process,
             inputs=[image_input, text_input, extra_text],
@@ -92,6 +96,7 @@ def gradio_interface():
         )
 
     return demo
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -108,6 +113,7 @@ def main():
         demo.launch(server_name="0.0.0.0", server_port=9801)
     else:
         print("No UI mode selected. Use --gradio_ui to launch the Gradio interface.")
+
 
 if __name__ == "__main__":
     main()
